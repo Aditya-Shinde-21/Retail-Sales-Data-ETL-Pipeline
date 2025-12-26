@@ -18,5 +18,3 @@ def get_insert_statements():
             f"INSERT INTO customer (first_name, last_name, address, pincode, phone_number, customer_joining_date) VALUES ('{first_name}', '{last_name}', '{address}', '{pincode}', '{phone_number}', '{joining_date}');")
 
     return insert_statements
-
-# insert_statements = generate_customer_data()
