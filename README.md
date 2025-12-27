@@ -46,46 +46,53 @@ This project demonstrates core **data engineering fundamentals** such as distrib
 
 ## Folder Structure
 
-Project structure:-
 my_project/
 ├── docs/
 │   ├── Architecture.png
 │   └── database_schema.png
+│
 ├── resources/
 │   ├── dev/
-│   │    ├── config.py
-│   │    └── requirement.txt
-│   ├── sql_scripts/
-│   │    └── create_table_scripts.sql
+│   │   ├── config.py
+│   │   └── requirements.txt
+│   │
+│   └── sql_scripts/
+│       └── create_table_scripts.sql
+│
 ├── scripts/
 │   ├── generate_data/
-│   │    ├── generate_csv_data.py
-│   │    ├── generate_customer_table_data.py
-│   │    ├── generate_product_table_data.py
-│   │    ├── upload_file_to_s3.py
-│   │    └── write_generated_data_to_database.py
-│   ├── main/
-│   │    └── move/
-│   │    │      └── move_files.py
-│   │    └── read/
-│   │    │      ├── aws_read.py
-│   │    │      └── database_read.py
-│   │    └── transformations/
-│   │    │      └── jobs/
-│   │    │      │     ├── customer_mart_sql_transform_write.py
-│   │    │      │     ├── dimension_tables_join.py
-│   │    │      │     └──sales_mart_sql_transform_write.py
-│   │    │      └── main.py
-│   │    └── utility/
-│   │    │      ├── encrypt_decrypt.py
-│   │    │      ├── logging_config.py
-│   │    │      ├── s3_client_object.py
-│   │    │      ├── spark_session.py
-│   │    │      └── my_sql_session.py
-│   │    └── write/
-│   │    │      ├── database_write.py
-│   │    │      └── format_writer.py
-├── README.md
+│   │   ├── generate_csv_data.py
+│   │   ├── generate_customer_table_data.py
+│   │   ├── generate_product_table_data.py
+│   │   ├── upload_file_to_s3.py
+│   │   └── write_generated_data_to_database.py
+│   │
+│   └── main/
+│       ├── move/
+│       │   └── move_files.py
+│       │
+│       ├── read/
+│       │   ├── aws_read.py
+│       │   └── database_read.py
+│       │
+│       ├── transformations/
+│       │   └── jobs/
+│       │       ├── customer_mart_sql_transform_write.py
+│       │       ├── dimension_tables_join.py
+│       │       └── sales_mart_sql_transform_write.py
+│       │
+│       ├── utility/
+│       │   ├── encrypt_decrypt.py
+│       │   ├── logging_config.py
+│       │   ├── s3_client_object.py
+│       │   ├── spark_session.py
+│       │   └── my_sql_session.py
+│       │
+│       └── write/
+│           ├── database_write.py
+│           └── format_writer.py
+│
+└── README.md
 
 ---
 
