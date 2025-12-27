@@ -99,10 +99,10 @@ my_project/
 ## How to Run
 
 ### 1. Clone the repository
-
+```
 git clone https://github.com/Aditya-Shinde-21/Sales-Data-ETL.git
 cd Sales-Data-ETL
-
+```
 ### 2. Create virtual environment
 ```
 python -m venv .venv
@@ -110,10 +110,10 @@ source .venv/bin/activate      # Linux / macOS
 .venv\Scripts\activate         # Windows
 ```
 ### 3. Install dependencies
-
+```
 pip install -r requirements.txt
-
+```
 ### 4. Configure AWS and MySQL
 
-Configure AWS credentials for S3 access
-Update MySQL connection details in config files
+#### Configure AWS credentials for S3 access
+#### Update MySQL connection details in config files
