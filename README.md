@@ -45,7 +45,7 @@ This project demonstrates core **data engineering fundamentals** such as distrib
 ---
 
 ## Folder Structure
-
+```
 my_project/
 ├── docs/
 │   ├── Architecture.png
@@ -93,7 +93,7 @@ my_project/
 │           └── format_writer.py
 │
 └── README.md
-
+```
 ---
 
 ## How to Run
