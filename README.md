@@ -46,7 +46,7 @@ This project demonstrates core **data engineering fundamentals** such as distrib
 
 ## Folder Structure
 ```
-my_project/
+Sales-Data-ETL/
 ├── docs/
 │   ├── Architecture.png
 │   └── database_schema.png
