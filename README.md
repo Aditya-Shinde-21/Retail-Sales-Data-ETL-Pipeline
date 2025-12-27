@@ -126,5 +126,4 @@ pip install -r requirements.txt
 #### Upload data to s3 from ![upload to s3](scripts/generate_data/upload_file_to_s3.py)
 
 ### 6. ETL orchestration
-#### Run ETL orchestration from
-![main](scripts/main/transformations/main.py)
+#### Run ETL orchestration from ![main](scripts/main/transformations/main.py)
