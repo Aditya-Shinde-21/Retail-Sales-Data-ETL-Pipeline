@@ -11,7 +11,7 @@ This project demonstrates core **data engineering fundamentals** such as distrib
 
 ## High-Level Architecture
 
-![Architecture Diagram](docs/architecture.png)
+![Architecture Diagram](docs/Architecture.png)
 
 **Flow:**
 - **Sources**: AWS S3 (raw files), MySQL (dimension tables)
