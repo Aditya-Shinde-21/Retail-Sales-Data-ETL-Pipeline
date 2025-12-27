@@ -123,3 +123,4 @@ pip install -r requirements.txt
 
 ### 6. ETL orchestration
 #### Run ETL orchestration from ```scripts/main/transformations/main.py```
+![main](scripts/main/transformations/main.py)
