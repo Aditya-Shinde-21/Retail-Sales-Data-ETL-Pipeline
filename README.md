@@ -121,5 +121,5 @@ pip install -r requirements.txt
 #### Generate data from ```scripts/generate_data/generate_csv_data.py``` and ```scripts/generate_data/write_generated_data_to_database.py```
 #### Upload data to s3 from ```scripts/generate_data/upload_file_to_s3.py```
 
-### 6. ETL orchestration``` main.py ```
-#### Run ETL orchestration from ```main.py```
+### 6. ETL orchestration
+#### Run ETL orchestration from ```scripts/main/transformations/main.py```
