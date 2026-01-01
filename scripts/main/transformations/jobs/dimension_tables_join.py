@@ -1,7 +1,9 @@
 from pyspark.sql.functions import *
-from scripts.main.utility.logging_config import *
-#enriching the data from different table
+
+
+#enriching the data from dimension tables
 def dimension_table_joins(sales_df,customer_df,store_df,sales_team_df,product_df):
+    
     # Join fact with dimensions
     joined_df = sales_df.join(customer_df, sales_df.customer_id == customer_df.customer_id, "inner")\
         .join(store_df, sales_df.store_id == store_df.id, "inner")\
@@ -46,3 +48,4 @@ def dimension_table_joins(sales_df,customer_df,store_df,sales_team_df,product_df
         )
 
     return result_df
+
