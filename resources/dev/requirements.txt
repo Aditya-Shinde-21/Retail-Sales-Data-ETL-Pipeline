@@ -3,5 +3,5 @@ pycryptodome
 loguru
 boto3
 pyspark
-findspark
+apache-airflow
 mysql-connector-python
