@@ -1,5 +1,6 @@
 import traceback
 from scripts.main.utility.logging_config import *
+
 class FormatWriter:
     def __init__(self,mode,data_format):
         self.mode = mode
@@ -12,6 +13,7 @@ class FormatWriter:
                 .mode(self.mode) \
                 .option("path", file_path) \
                 .save()
+            
         except Exception as e:
             logger.error(f"Error writing the data : {str(e)}")
             traceback_message = traceback.format_exc()
