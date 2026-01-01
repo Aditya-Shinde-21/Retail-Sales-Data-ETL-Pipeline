@@ -23,7 +23,7 @@ from scripts.main.write.format_writer import *
 
 # *********************************************************************************************************
 # Get S3 Client: access_key_id and secret_key_id will be accessed from airflow connection
-s3_client = S3ClientProvider().get_client()
+s3_client = boto3.client("s3")
 
 # Get file path of all files in source directory
 try:
@@ -374,3 +374,4 @@ else:
 
 # **************************************************************************************************
 spark.stop()
+
