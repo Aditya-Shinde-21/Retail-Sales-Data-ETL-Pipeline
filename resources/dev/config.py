@@ -18,7 +18,7 @@ s3_processed_directory = "s3-directory"         #|
 #Database credential
 # MySQL database connection properties
 database_name = "database_name"
-url = f"jdbc:mysql://localhost:3306/{database_name}"
+url = f"jdbc:mysql://host.docker.internal:3306/{database_name}"
 properties = {
     "user": "root",
     "password": "user-password",
@@ -38,5 +38,6 @@ sales_team_data_mart_table = "sales_team_data_mart"
 
 # Required columns
 mandatory_columns = ["customer_id","store_id","product_id","sales_date","sales_person_id","price","quantity","total_cost"]
+
 
 
