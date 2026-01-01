@@ -1,8 +1,7 @@
 # Standard libraries
 import datetime
-import shutil
 
-# Third-party libraries
+# Spark libraries
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from pyspark.storagelevel import StorageLevel
@@ -14,7 +13,6 @@ from scripts.main.read.database_read import DatabaseReader
 from scripts.main.transformations.jobs.customer_mart_sql_transform_write import *
 from scripts.main.transformations.jobs.sales_mart_sql_transform_write import *
 from scripts.main.upload.upload_to_s3 import *
-from scripts.main.utility.encrypt_decrypt import decrypt
 from scripts.main.utility.s3_client_object import *
 from scripts.main.utility.logging_config import logger
 from scripts.main.utility.my_sql_session import *
@@ -24,10 +22,8 @@ from scripts.main.transformations.jobs.dimension_tables_join import *
 from scripts.main.write.format_writer import *
 
 # *********************************************************************************************************
-# Get S3 Client
-s3_client = S3ClientProvider(aws_access_key=decrypt(config.aws_access_key),
-                             aws_secret_key=decrypt(config.aws_secret_key)
-                             ).get_client()
+# Get S3 Client: access_key_id and secret_key_id will be accessed from airflow connection
+s3_client = S3ClientProvider().get_client()
 
 # Get file path of all files in source directory
 try:
@@ -101,7 +97,6 @@ if error_files:
     for file_path in error_files:
         message = move_file_s3_to_s3(s3_client=s3_client,
                                      s3a_path=file_path,
-                                     source_directory=config.s3_source_directory,
                                      destination_directory=config.s3_error_directory)
         logger.info(f"moved error files to {message}")
 
@@ -308,7 +303,7 @@ print("Dataframe written to:", s3_output_path)
 logger.info("******************** writing sales data mart partitioned **************************")
 
 s3_output_path = f"s3a://{config.bucket_name}/sales_data_mart_partitioned/sales_datamart_partitioned.parquet"
-final_sales_team_data_mart_df.write.format("parquet")\
+final_sales_team_data_mart_df.repartition(4).write.format("parquet")\
     .option("header", "true")\
     .mode("overwrite")\
     .partitionBy("sales_date_year", "sales_date_month", "store_id")\
@@ -343,9 +338,8 @@ fact_dimension_join_df.unpersist(blocking=True)
 for file_path in correct_files:
     message = move_file_s3_to_s3(s3_client=s3_client,
                                  s3a_path=file_path,
-                                 source_directory=config.s3_source_directory,
                                  destination_directory=config.s3_processed_directory)
-    logger.info(f"moved to {message}")
+    logger.info(f"moved proccessed files to {message}")
 
 # **************************************************************************************************
 # Update processed file status as Inactive(I) in staging table
@@ -379,7 +373,4 @@ else:
     sys.exit()
 
 # **************************************************************************************************
-# Spark session terminates with this program
-# Monitor/analyze jobs in Spark UI, then press any key to terminate
-
-input("Press any key to terminate: ")
+spark.stop()
