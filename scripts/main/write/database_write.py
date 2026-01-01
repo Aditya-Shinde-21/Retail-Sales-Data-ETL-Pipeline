@@ -7,7 +7,6 @@ class DatabaseWriter:
 
     def write_dataframe(self,df,table_name):
         try:
-            print("inside write_dataframe")
             df.write.jdbc(url = self.url,
                           table = table_name,
                           mode = "append",
@@ -15,3 +14,4 @@ class DatabaseWriter:
             logger.info(f"Data successfully written into {table_name} table ")
         except Exception as e:
             return {f"Message: Error occurred {e}"}
+
