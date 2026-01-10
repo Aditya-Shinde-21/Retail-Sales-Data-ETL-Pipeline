@@ -129,6 +129,7 @@ if correct_files:
 
 else:
     logger.info("**************** No files to process!!! *******************")
+    raise Exception("************** No Data to process *******************")
 
 # **************************************************************************************************
 ## Staging table needs to be updated with the files to process with status as Active(A)
@@ -137,34 +138,29 @@ logger.info("********** Updating product_staging_table that we have started the 
 insert_statements = []
 formatted_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-if correct_files:
-    for file in correct_files:
-        parsed = urlparse(file)
-        filename = parsed.path.rstrip("/").split("/")[-1]
+for file in correct_files:
+    parsed = urlparse(file)
+    filename = parsed.path.rstrip("/").split("/")[-1]
 
-        statement = f"INSERT INTO {config.database_name}.{config.staging_table}"\
-                        f"(file_name, file_location, created_date, status)"\
-                        f"VALUES ('{filename}', '{file}', '{formatted_date}', 'A');"
-        insert_statements.append(statement)
+    statement = f"INSERT INTO {config.database_name}.{config.staging_table}"\
+                f"(file_name, file_location, created_date, status)"\
+                f"VALUES ('{filename}', '{file}', '{formatted_date}', 'A');"
+    insert_statements.append(statement)
 
-    logger.info(f"Insert statements created for staging table --- {insert_statements}")
+logger.info(f"Insert statements created for staging table --- {insert_statements}")
 
-    # Execute SQL statements in My SQL
-    logger.info("***************** Connecting with My SQL server ****************")
-    connection = get_mysql_connection()
-    cursor = connection.cursor()
-    logger.info("**************** Connected to My SQL server successfully ***************")
+# Execute SQL statements in My SQL
+logger.info("***************** Connecting with My SQL server ****************")
+connection = get_mysql_connection()
+cursor = connection.cursor()
+logger.info("**************** Connected to My SQL server successfully ***************")
 
-    for statement in insert_statements:
-        cursor.execute(statement)
-        connection.commit()
-    cursor.close()
-    connection.close()
-    logger.info("**************** Staging table updated successfully ***************")
-
-else:
-    logger.error("*********** No files to process ************")
-    raise Exception("************** No Data to process *******************")
+for statement in insert_statements:
+    cursor.execute(statement)
+    connection.commit()
+cursor.close()
+connection.close()
+logger.info("**************** Staging table updated successfully ***************")
 
 # **************************************************************************************************
 ## Create dataframe and load data from correct files
@@ -181,13 +177,15 @@ schema = StructType([
     StructField("additional_column", StringType(), True),
 ])
 
-final_df_to_process = spark.createDataFrame(data=[], schema=schema)
+sales_df = spark.createDataFrame(data=[], schema=schema)
 
 # Storing concatenated data from additional columns in 'additional_column'
 for file in correct_files:
     file_df = spark.read.format("csv")\
-        .option("header", "true") \
-        .option("inferSchema", "true") \
+        .option("header", "true")\
+        .option("inferSchema", "true")\
+        .option("mode", "DROPMALFORMED")\
+        .option("badRecordsPath", f"s3a://{config.bucket_name}/{config.s3_bad_records_directory}")\
         .load(file)
 
     file_schema = file_df.columns
@@ -205,11 +203,39 @@ for file in correct_files:
         file_df = file_df.withColumn("additional_column", lit(None))\
             .select(*config.mandatory_columns, "additional_column")
 
-    final_df_to_process = final_df_to_process.union(file_df)
+    sales_df = sales_df.union(file_df)
 
+# **************************************************************************************************
+## Ensuring only clean records are processed
+# Flag invalid records
+df_with_validation_flag = sales_df.withColumn(
+    "validation_error",
+    when(col("customer_id").isNull(), "customer_id_missing")
+    .when(col("product_id").isNull(), "product_id_missing")
+    .when(col("sales_person_id").isNull(), "sales_person_id_missing")
+    .when(col("sales_date").isNull(), "sales_date_missing")
+    .when(col("quantity") <= 0, "invalid_quantity")
+    .when(col("price") <= 0, "invalid_price")
+    .otherwise(None)
+)
+
+# Write invalid records to s3 for review
+invalid_df = df_with_validation_flag.filter(col("validation_error").isNotNull())
+invalid_count = invalid_df.count()
+logger.info(f"@@@@@@@@@@@@@@@@ Invalid record count: {invalid_count} @@@@@@@@@@@@@@@@@@@")
+parquet_writer = FormatWriter(mode = "append", data_format = "parquet")
+s3_output_path = f"s3a://{config.bucket_name}/{config.s3_invalid_records_directory}"
+parquet_writer.write_to_format(invalid_df, s3_output_path)
+logger.info(f"@@@@@@@@@@@@@@@@ Writing Invalid records to {config.s3_invalid_records_directory} @@@@@@@@@@@@@@@@@@@")
+
+# Get Valid records
+sales_df_clean = df_with_validation_flag.filter(col("validation_error").isNull())
+valid_count = sales_df_clean.count()
+logger.info(f"@@@@@@@@@@@@@@@@ Valid record count: {valid_count} @@@@@@@@@@@@@@@@@@@")
+
+sales_df_clean.persist(StorageLevel.MEMORY_AND_DISK)
 logger.info("@@@@@@@@@@@@@@@@@@@@@ Final Dataframe which will be processed:")
-final_df_to_process.persist(StorageLevel.MEMORY_AND_DISK)
-final_df_to_process.show()
+sales_df_clean.show()
 
 # **************************************************************************************************
 ## Read the data from all dimension tables
@@ -233,13 +259,13 @@ logger.info("************* Loading store table into store_table_df *************
 store_table_df = database_client.create_dataframe(spark, config.store_table)
 
 # **************************************************************************************************
-fact_dimension_join_df = dimension_table_joins(final_df_to_process,
-                                                        customer_table_df,
-                                                        store_table_df,
-                                                        sales_team_table_df,
-                                                        product_table_df)
+fact_dimension_join_df = dimension_table_joins(sales_df_clean,
+                                                customer_table_df,
+                                                store_table_df,
+                                                sales_team_table_df,
+                                                product_table_df)
 
-final_df_to_process.unpersist(blocking=True )
+sales_df_clean.unpersist(blocking=True )
 fact_dimension_join_df.persist(StorageLevel.MEMORY_AND_DISK)
 # Final enriched data
 logger.info("******************* Final Enriched Data *********************")
@@ -374,5 +400,6 @@ else:
 
 # **************************************************************************************************
 spark.stop()
+
 
 
