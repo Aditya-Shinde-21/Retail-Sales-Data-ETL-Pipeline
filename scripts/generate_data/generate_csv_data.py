@@ -36,7 +36,7 @@ with open(csv_file_path, "w", newline="") as csvfile:
     for r in range(1, 1000001):
         customer_id = random.randint(1, 500)
         store_id = random.randint(121, 124)
-        product_id = random.randint(1, 88)
+        product_id = random.randint(1, 100)
         price = products[product_id]
         sales_date = start_date + timedelta(days=random.randint(0, (end_date - start_date).days))
         sales_person_id = random.choice(sales_persons[store_id])
@@ -56,3 +56,4 @@ with open(csv_file_path, "w", newline="") as csvfile:
     csvwriter.writerow([504, 122, 5, 6, "2022-10-22", -3, 2, 110])
     
 print("CSV file generated successfully.")
+
