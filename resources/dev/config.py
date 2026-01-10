@@ -10,9 +10,11 @@ bucket_name = "s3-bucket-name"
 region = "s3-bucket-region"
 s3_customer_datamart_directory = "s3-directory" #|
 s3_sales_datamart_directory = "s3-directory"    #|
-s3_source_directory = "s3-directory"            #|-> correcponding folder/directory names, example: s3_source_directory = "sales_data/"
-s3_error_directory = "s3-directory"             #|
+s3_source_directory = "s3-directory"            #|
+s3_error_directory = "s3-directory"             #|-> corresponding folder/directory names, example: s3_source_directory = "sales_data/"
 s3_processed_directory = "s3-directory"         #|
+s3_bad_records_directory = "s3-directory"       #|
+s3_invalid_records_directory = "s3-directory"   #|
 
 
 #Database credential
@@ -25,19 +27,20 @@ properties = {
     "driver": "com.mysql.cj.jdbc.Driver"
 }
 
-# Table name
+# Dimension table names
 customer_table_name = "customer"
 staging_table = "staging_table"
 product_table = "product"
 sales_team_table = "sales_team"
 store_table = "store"
 
-#Data Mart details
+#Data Mart table names
 customer_data_mart_table = "customers_data_mart"
 sales_team_data_mart_table = "sales_team_data_mart"
 
 # Required columns
 mandatory_columns = ["customer_id","store_id","product_id","sales_date","sales_person_id","price","quantity","total_cost"]
+
 
 
 
