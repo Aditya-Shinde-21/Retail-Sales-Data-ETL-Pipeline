@@ -8,6 +8,7 @@ CREATE TABLE staging_table (
     status VARCHAR(1)
 );
 
+
 --Customer table
 CREATE TABLE customer (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -19,6 +20,7 @@ CREATE TABLE customer (
     customer_joining_date DATE
 );
 
+
 --store table
 CREATE TABLE store (
     id INT PRIMARY KEY,
@@ -27,6 +29,7 @@ CREATE TABLE store (
     store_manager_name VARCHAR(100),
     store_opening_date DATE
 );
+
 
 --data of store table
 INSERT INTO store (id, address, store_pincode, store_manager_name, store_opening_date)
@@ -86,6 +89,7 @@ VALUES
     ('Shashank', 'Mishra', 20, 'N', 'Delhi', '400001', '2019-05-05'),
     ('Pooja', 'Joshi', null, 'Y', 'Delhi', '400001', '2019-05-05');
 
+
 -- fact table sales
 CREATE TABLE sales (
     customer_id INT,
@@ -113,7 +117,7 @@ CREATE TABLE sales (
 
 
 --Customer Data Mart
-CREATE TABLE customers_data_mart (
+CREATE TABLE customers_monthly_sales (
     customer_id INT ,
     full_name VARCHAR(100),
     address VARCHAR(200),
@@ -123,9 +127,8 @@ CREATE TABLE customers_data_mart (
     total_sales DECIMAL(10, 2)
 );
 
-
 --sales mart table
-CREATE TABLE sales_team_data_mart (
+CREATE TABLE sales_person_monthly_incentive (
     store_id INT,
     sales_person_id INT,
     full_name VARCHAR(255),
@@ -133,15 +136,4 @@ CREATE TABLE sales_team_data_mart (
     sales_date_month INT,
     total_sales DECIMAL(10, 2),
     incentive DECIMAL(10, 2)
-);
-
---s3 bucket table
-CREATE TABLE s3_bucket_info (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    bucket_name VARCHAR(255),
-    access_key_id VARCHAR(255),
-    secret_key VARCHAR(255),
-    created_date TIMESTAMP ,
-    updated_date TIMESTAMP ,
-    status VARCHAR(20)
 );
