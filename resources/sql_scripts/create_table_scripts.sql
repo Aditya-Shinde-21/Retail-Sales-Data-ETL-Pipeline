@@ -116,7 +116,7 @@ CREATE TABLE sales (
 );
 
 
---Customer Data Mart
+#--Customer monthly sales table
 CREATE TABLE customers_monthly_sales (
     customer_id INT ,
     full_name VARCHAR(100),
@@ -127,7 +127,7 @@ CREATE TABLE customers_monthly_sales (
     total_sales DECIMAL(10, 2)
 );
 
---sales mart table
+#--sales person incentive table
 CREATE TABLE sales_person_monthly_incentive (
     store_id INT,
     sales_person_id INT,
@@ -137,3 +137,4 @@ CREATE TABLE sales_person_monthly_incentive (
     total_sales DECIMAL(10, 2),
     incentive DECIMAL(10, 2)
 );
+
