@@ -1,7 +1,6 @@
 from pyspark.sql.functions import *
 from pyspark.sql.window import Window
 from pyspark.storagelevel import StorageLevel
-from resources.dev import config
 from scripts.main.write.database_write import DatabaseWriter
 
 # Calculation for sales team mart
@@ -9,7 +8,7 @@ from scripts.main.write.database_write import DatabaseWriter
 # Give the top performer a 1% incentive of total sales of the month
 # Write the data into MySQL table
 
-def sales_mart_calculation_table_write(final_sales_team_data_mart_df):
+def sales_mart_calculation_table_write(final_sales_team_data_mart_df, config):
     # Step 1: Aggregate monthly sales per salesperson
     monthly_sales = final_sales_team_data_mart_df.groupBy(
         "store_id",
@@ -46,7 +45,7 @@ def sales_mart_calculation_table_write(final_sales_team_data_mart_df):
     result_df.show()
 
     # Write the Data into MySQL customers_data_mart table
-    db_writer = DatabaseWriter(url = config.url, properties = config.properties)
-    db_writer.write_dataframe(result_df, config.sales_team_data_mart_table)
-
+    db_writer = DatabaseWriter()
+    db_writer.write_dataframe(result_df, config["tables"]["datamart"]["sales_person_incentive_table"])
     result_df.unpersist(blocking=True)
+
