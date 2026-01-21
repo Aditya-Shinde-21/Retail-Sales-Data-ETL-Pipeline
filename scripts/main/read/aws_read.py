@@ -13,9 +13,6 @@ class S3Reader:
                 return files
             else:
                 return []
+                
         except Exception as e:
-            error_message = f"Error listing files: {e}"
-            traceback_message = traceback.format_exc()
-            logger.error("Got this error : %s",error_message)
-            print(traceback_message)
-            raise
+            raise e
