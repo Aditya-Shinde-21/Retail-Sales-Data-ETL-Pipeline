@@ -3,6 +3,7 @@ import os
 
 
 def get_mysql_connection():
+    
     try:
         connection = mysql.connector.connect(
             host=os.environ["MYSQL_HOST"],
@@ -10,9 +11,11 @@ def get_mysql_connection():
             database=os.environ["MYSQL_DATABASE"],
             user=os.environ["MYSQL_USER"],
             password=os.environ["MYSQL_PASSWORD"],
-            autocommit=True,
+            autocommit=False,
+            raise_on_warnings=True
         )
-    except Exception as e:
-        raise e
+
+    except mysql.connector.Error as err:
+        raise RuntimeError(f"MySQL connection failed: {err}") from err
 
     return connection
