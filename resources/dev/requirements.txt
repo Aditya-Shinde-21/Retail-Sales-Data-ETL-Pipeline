@@ -1,5 +1,3 @@
-pycryptodomex
-pycryptodome
 loguru
 boto3
 pyspark
