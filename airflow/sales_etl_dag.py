@@ -33,7 +33,7 @@ def spark_bash_command():
     export MYSQL_PASSWORD='{mysql_conn.password}'
     
     # ------------------------ PYTHON --------------------------
-    export PYTHONPATH=/mnt/c/Users/Aditya/PycharmProjects/de_project1:$PYTHONPATH
+    export PYTHONPATH=/mnt/path/to/project/files:$PYTHONPATH
     
     # ------------------------- Spark --------------------------
     spark-submit \
@@ -41,9 +41,7 @@ def spark_bash_command():
     --driver-memory 4g \
     --conf spark.driver.memoryOverhead=512m \
     --conf spark.hadoop.fs.s3a.fast.upload=true \
-    --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/mnt/c/Users/Aditya/PycharmProjects/de_project1/resources/dev/log4j.properties" \
-    --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/mnt/c/Users/Aditya/PycharmProjects/de_project1/resources/dev/log4j.properties" \
-    /mnt/c/Users/Aditya/PycharmProjects/de_project1/scripts/main/transformations/jobs/main.py
+    /mnt/path/to/scripts/main/transformations/jobs/main.py
     """
 
 
@@ -62,7 +60,7 @@ def validate_sales_data():
 default_args = {
     "owner": "Aditya",
     "depends_on_past": False,
-    "retries": 1,
+    "retries": 3,
     "retry_delay": timedelta(minutes=10)
 }
 
@@ -76,8 +74,8 @@ with DAG(
 
     wait_for_sales_data = S3KeySensor(
         task_id="wait_for_sales_data",
-        bucket_name="customer-sales-data-project",
-        bucket_key="sales_data/*.csv",
+        bucket_name="s3-bucket-name",
+        bucket_key="source_directory/*.csv",
         wildcard_match=True,
         aws_conn_id="aws_default",
         poke_interval=180,
@@ -93,5 +91,6 @@ with DAG(
         task_id="validate_data",
         python_callable=validate_sales_data
     )
+
 
     wait_for_sales_data >> run_spark_etl >> validate_data
