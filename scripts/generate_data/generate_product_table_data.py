@@ -5,8 +5,8 @@ from faker import Faker
 from datetime import datetime, timedelta
 
 def get_insert_statements():
-
-    with open("D:\\DE_Project_Files\\retail_products_500.json", "r") as f:
+    # retail_products.json contains product_name: price key-value pairs
+    with open("filepath\\to\\retail_products.json", "r") as f:
         products = json.load(f)
 
     fake = Faker('en_IN')
@@ -29,5 +29,6 @@ def get_insert_statements():
             start_date="+30d", end_date="+2y"
         ).strftime("%Y-%m-%d")
         insert_statements.append(f"INSERT INTO product (name, current_price, old_price, created_date, updated_date, expiry_date) VALUES ('{name}', '{current_price}', '{old_price}', '{created_date}', '{updated_date}', '{expiry_date}');")
+
 
     return insert_statements
