@@ -5,7 +5,7 @@ from datetime import datetime
 def get_insert_statements():
     fake = Faker('en_IN')
     insert_statements = []
-    for _ in range(500):
+    for _ in range(1000):
         first_name = fake.first_name()
         last_name = fake.last_name()
         address = 'Delhi'

@@ -1,5 +1,7 @@
+pycryptodomex
+pycryptodome
 loguru
 boto3
 pyspark
-apache-airflow
+findspark
 mysql-connector-python

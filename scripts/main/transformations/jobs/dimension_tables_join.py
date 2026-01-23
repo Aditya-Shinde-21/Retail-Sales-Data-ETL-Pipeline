@@ -1,7 +1,7 @@
 from pyspark.sql.functions import *
 
 # Enriching the data from dimension table
-def dimension_table_joins(sales_df,customer_df,store_df,sales_team_df,product_df):
+def enrich_with_dimensions(sales_df, customer_df, store_df, sales_team_df, product_df):
     # Join fact with dimensions
     joined_df = sales_df.join(customer_df, sales_df.customer_id == customer_df.customer_id, "inner")\
         .join(store_df, sales_df.store_id == store_df.id, "inner")\
@@ -25,7 +25,7 @@ def dimension_table_joins(sales_df,customer_df,store_df,sales_team_df,product_df
 
             # Sales info
             sales_df.sales_date.alias("sales_date"),
-            sales_df.total_cost.alias("total_cost"),
+            round(sales_df.total_cost, 2).alias("total_cost"),
             sales_df.quantity.alias("quantity"),
             sales_df.price.alias("price"),
 
@@ -44,5 +44,5 @@ def dimension_table_joins(sales_df,customer_df,store_df,sales_team_df,product_df
             sales_team_df.address.alias("sales_person_address"),
             sales_team_df.pincode.alias("sales_person_pincode")
         )
-    
+
     return result_df

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+
 from airflow import DAG
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from airflow.providers.standard.operators.bash import BashOperator
@@ -10,19 +11,19 @@ from airflow.providers.mysql.hooks.mysql import MySqlHook
 
 def spark_bash_command():
     #AWS credentials
-    aws = AwsBaseHook(aws_conn_id="aws_connection_id", client_type="sts")
+    aws = AwsBaseHook(aws_conn_id="aws_default", client_type="sts")
     creds = aws.get_credentials()
 
     # MySQL credentials
-    mysql = MySqlHook(mysql_conn_id="mysql_connection_id")
-    mysql_conn = mysql.get_connection()
+    mysql = MySqlHook(mysql_conn_id="mysql_default")
+    mysql_conn = mysql.get_connection("mysql_default")
 
     return f"""
     # Create environment variables for connection credentials
     # ----------------- AWS ------------------------
     export AWS_ACCESS_KEY_ID={creds.access_key}
     export AWS_SECRET_ACCESS_KEY={creds.secret_key}
-    export AWS_DEFAULT_REGION=your-s3-bucket-region
+    export AWS_DEFAULT_REGION=us-east-1
     
     # ---------- MySQL ----------
     export MYSQL_HOST={mysql_conn.host}
@@ -32,19 +33,22 @@ def spark_bash_command():
     export MYSQL_PASSWORD='{mysql_conn.password}'
     
     # ------------------------ PYTHON --------------------------
-    export PYTHONPATH=/mnt/project_code_path:$PYTHONPATH
+    export PYTHONPATH=/mnt/c/Users/Aditya/PycharmProjects/de_project1:$PYTHONPATH
     
     # ------------------------- Spark --------------------------
-    spark-submit \                               #}                                                 
-    --master local[3] \                          #}                                                
-    --driver-memory 4g \                         #}--> configure as needed 
-    --conf spark.driver.memoryOverhead=512m \    #}
-    /mnt/filepath/to/main.py                     #}
+    spark-submit \
+    --master local[3] \
+    --driver-memory 4g \
+    --conf spark.driver.memoryOverhead=512m \
+    --conf spark.hadoop.fs.s3a.fast.upload=true \
+    --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/mnt/c/Users/Aditya/PycharmProjects/de_project1/resources/dev/log4j.properties" \
+    --conf "spark.executor.extraJavaOptions=-Dlog4j.configuration=file:/mnt/c/Users/Aditya/PycharmProjects/de_project1/resources/dev/log4j.properties" \
+    /mnt/c/Users/Aditya/PycharmProjects/de_project1/scripts/main/transformations/jobs/main.py
     """
 
 
 def validate_sales_data():
-    hook = MySqlHook(mysql_conn_id="mysql_connection_id")
+    hook = MySqlHook(mysql_conn_id="mysql_default")
 
     with hook.get_conn() as conn:
         with conn.cursor() as cursor:
@@ -56,7 +60,7 @@ def validate_sales_data():
 
 
 default_args = {
-    "owner": "owner_name",
+    "owner": "Aditya",
     "depends_on_past": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=10)
@@ -66,16 +70,16 @@ with DAG(
     dag_id="retail_sales_batch_etl_local",
     default_args=default_args,
     start_date=datetime(2026, 1, 1),
-    schedule="@monthy",
+    schedule="@Monthly",
     catchup=False,
 ) as dag:
 
     wait_for_sales_data = S3KeySensor(
         task_id="wait_for_sales_data",
-        bucket_name="s3_bucket_name",
-        bucket_key="data_directory/*.csv",
+        bucket_name="customer-sales-data-project",
+        bucket_key="sales_data/*.csv",
         wildcard_match=True,
-        aws_conn_id="aws_connection_id",
+        aws_conn_id="aws_default",
         poke_interval=180,
         timeout=1800,
     )

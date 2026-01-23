@@ -1,7 +1,7 @@
 from pathlib import Path
 import yaml
 
-def load_config(relative_path="resources/dev/yaml_config.yaml"):
+def load_config(relative_path="resources/dev/config.yaml"):
     project_root = Path(__file__).resolve().parents[3]
     config_path = project_root / relative_path
 
