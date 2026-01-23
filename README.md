@@ -163,3 +163,67 @@ cp /mnt/d/Retail-Sales-Data-ETL-Pipeline/airflow/sales_etl_dag.py \
 ```
 airflow standalone
 ```
+## Airflow Configuration
+
+- AWS and MySQL credentials are managed using **Airflow Connections**
+- No credentials are hardcoded in Spark or application code
+- Environment variables are injected automatically by Airflow at runtime
+
+---
+
+## Data Validation Examples
+
+- Non-null primary key validation  
+- Positive price validation  
+- Duplicate removal based on business keys  
+- Schema conformity checks  
+
+Invalid records are written to a **separate S3 location** for audit, troubleshooting, and reprocessing.
+
+---
+
+## Performance Observations
+
+- Disk spill analysis using **Spark UI**
+- Partition tuning (`repartition` vs `coalesce`)
+- Comparison between optimized and unoptimized pipeline runs
+- Demonstrates realistic performance behavior across different data scales and resource constraints
+
+---
+
+## Limitations
+
+- Spark runs in **local mode** (no distributed cluster)
+- IAM roles are not used (local AWS credentials via Airflow Connections)
+- SCD Type 2 logic is discussed but not fully implemented
+
+---
+
+## Future Enhancements
+
+- Implement **SCD Type 2** for product pricing
+- Add automated **data quality metrics**
+- Introduce backfill and reprocessing strategies
+- Integrate **Delta Lake** or **Apache Iceberg**
+- Deploy Spark on cloud platforms (EMR / Databricks)
+
+---
+
+## Why This Project Matters
+
+This is **not a toy ETL pipeline**.
+
+It demonstrates:
+
+- Real-world failure scenarios
+- Debugging and recovery workflows
+- Production-style logging and observability
+- Practical integration of **Apache Spark** and **Apache Airflow**
+
+---
+
+## Author
+
+**Aditya Shinde**  
+Data Engineer  
+Passionate about building scalable data pipelines
