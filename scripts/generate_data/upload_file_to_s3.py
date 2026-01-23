@@ -20,8 +20,9 @@ aws_access_key = input("Enter AWS Access Key: ")
 aws_secret_key = input("Enter AWS Secret Key: ")
 s3_client = boto3.Session(aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key).client('s3')
 
-local_file_path = "D:\\DE_Project_Files\\sales_data_to_s3\\"
-s3_directory = "sales_data/"
-s3_bucket = "customer-sales-data-project"
+local_file_path = "path\\to\\generated_sales_data\\"
+s3_directory = "source_directory/"
+s3_bucket = "s3_bucket_name"
+
 
 upload_to_s3(s3_client, s3_directory, s3_bucket, local_file_path)
