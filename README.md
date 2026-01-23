@@ -1,9 +1,27 @@
 # Retail-Sales-Data-ETL-Pipeline
+**Apache Spark | Apache Airflow | AWS S3 | MySQL | Python**
+
+---
 
 ## Overview
 
-**Retail-Sales-Data-ETL** is an end-to-end batch ETL pipeline built using **PySpark**.  
-The project ingests raw sales data from **AWS S3** and dimension data from **MySQL**, applies transformations and validations using Spark, and writes the processed data back to **S3** and **MySQL** for analytics and reporting. The pipeline is orchestrated using Apache Airflow.
+This project implements a **production-style batch ETL pipeline** for processing retail sales data using **Apache Spark**, orchestrated with **Apache Airflow**.  
+The pipeline ingests raw sales files from **Amazon S3**, validates and transforms the data, persists curated datasets, and ensures **idempotent processing** using a MySQL-backed staging layer.
+
+The implementation closely mirrors **real-world data engineering systems**, focusing on reliability, observability, and data quality rather than notebook-style experimentation.
+
+---
+
+## Technology Stack
+
+| Layer | Technology |
+|------|-----------|
+| Orchestration | Apache Airflow |
+| Processing | Apache Spark (Local Mode) |
+| Storage | AWS S3 |
+| Metadata & Tracking | MySQL |
+| Language | Python |
+| Environment | Windows + WSL (Local setup) |
 
 ---
 
@@ -11,39 +29,41 @@ The project ingests raw sales data from **AWS S3** and dimension data from **MyS
 
 ![Architecture Diagram](docs/Architecture.png)
 
-**Flow:**
-- **Sources**: AWS S3 (raw files), MySQL (dimension tables)
-- **Processing**: Apache Spark (PySpark)
-- **Sinks**: AWS S3 (processed Parquet data), MySQL (reporting tables)
+1. **Ingestion**
+   - Raw CSV/JSON files are read from an S3 source directory using `s3a://`.
+   - File discovery is handled dynamically.
 
----
+2. **Validation & Data Quality**
+   - Schema enforcement
+   - Mandatory field validation
+   - Business rule checks (e.g., positive prices)
+   - Duplicate handling
 
-## Data Flow
+3. **Transformation**
+   - Data normalization
+   - Aggregations and joins
+   - Partitioned Parquet output for analytics
 
-1. Read raw sales data from **AWS S3**.
-2. Perform data validation and schema checks.
-3. Read dimension tables from **MySQL**.
-4. Apply transformations and business logic using PySpark.
-5. Write processed data to:
-   - **S3** in Parquet format
-   - **MySQL** reporting tables
+4. **Persistence**
+   - Cleaned datasets written to S3 (data mart layer)
+   - Invalid records written to a separate S3 error path
+
+5. **Idempotency**
+   - MySQL staging table tracks file processing status
+   - Prevents reprocessing of previously ingested files
+
+6. **File Lifecycle Management**
+   - Successfully processed files → `processed/`
+   - Failed files → `error/`
+
+7. **Orchestration**
+   - Airflow DAG controls execution, retries, and failure handling
+   - Spark jobs executed via `spark-submit`
 
 ---
 
 ## Database ER Diagram
 ![ER Diagram](docs/database_schema.png)
-
----
-## Tech Stack
-
-| Technology | Usage |
-|----------|------|
-| PySpark/Apache Spark | Distributed data processing |
-| AWS S3 | Raw and processed data storage |
-| MySQL | Dimension tables and reporting tables |
-| Parquet | Columnar storage format |
-| Python | PySpark Transformations |
-| Apache Airflow | ETL pipeline orchestration |
 
 ---
 
@@ -59,7 +79,7 @@ Sales-Data-ETL/
 │
 ├── resources/
 │   ├── dev/
-│   │   ├── config.py
+│   │   ├── config.yaml
 │   │   └── requirements.txt
 │   │
 │   └── sql_scripts/
@@ -83,19 +103,21 @@ Sales-Data-ETL/
 │       │
 │       ├── transformations/
 │       │   └── jobs/
-│       │       ├── customer_mart_sql_transform_write.py
+│       │       ├── customer_reporting_transformations.py
+│       │       ├── data_validation.py
 │       │       ├── dimension_tables_join.py
-│       │       └── sales_mart_sql_transform_write.py
+│       │       ├── main.py
+│       │       └── salesperson_reporting_transformations.py
 │       │
 │       ├── utility/
-│       │   ├── encrypt_decrypt.py
+│       │   ├── config_loader.py
 │       │   ├── logging_config.py
-│       │   ├── spark_session.py
-│       │   └── my_sql_session.py
+│       │   ├── my_sql_session.py
+│       │   └── spark_session.py
 │       │
 │       └── write/
 │           ├── database_write.py
-│           └── format_writer.py
+│           └── dataframe_format_writer.py
 │
 └── README.md
 ```
