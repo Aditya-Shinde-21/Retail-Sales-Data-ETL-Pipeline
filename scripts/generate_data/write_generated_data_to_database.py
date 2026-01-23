@@ -4,7 +4,8 @@ import mysql.connector
 from scripts.generate_data import generate_product_table_data
 from scripts.generate_data import generate_customer_table_data
 
-config_path = "D:\DE_Project_Files\mysql_connector.json"
+# mysql_connector.json contains connection credentials
+config_path = "path\to\mysql_connector.json"
 config_file = Path(config_path)
 
 if not config_file.exists():
@@ -55,4 +56,5 @@ for row in query:
     print(*row, sep=' | | ')
 
 cursor.close()
+
 connection.close()
