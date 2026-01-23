@@ -30,7 +30,7 @@ The implementation closely mirrors **real-world data engineering systems**, focu
 ![Architecture Diagram](docs/Architecture.png)
 
 1. **Ingestion**
-   - Raw CSV/JSON files are read from an S3 source directory using `s3a://`.
+   - Raw CSV files are read from an S3 source directory using `s3a://`.
    - File discovery is handled dynamically.
 
 2. **Validation & Data Quality**
@@ -42,7 +42,7 @@ The implementation closely mirrors **real-world data engineering systems**, focu
 3. **Transformation**
    - Data normalization
    - Aggregations and joins
-   - Partitioned Parquet output for analytics
+   - Partitioned Parquet output for analytics marts
 
 4. **Persistence**
    - Cleaned datasets written to S3 (data mart layer)
@@ -62,8 +62,60 @@ The implementation closely mirrors **real-world data engineering systems**, focu
 
 ---
 
-## Database ER Diagram
+## Star Schema Design
 ![ER Diagram](docs/database_schema.png)
+
+---
+
+This project uses a **Star Schema–style data model** as the **final curated layer** produced by the ETL pipeline.  
+The schema is designed to support **clean data integration, consistency, and downstream consumption**.
+
+---
+
+### Fact Table
+
+**SALES**  
+The central fact table captures transactional sales data and contains measurable metrics:
+
+- `price`
+- `quantity`
+- `total_cost`
+- `sales_date`
+
+Foreign keys link the fact table to the dimensions:
+
+- `customer_id`
+- `store_id`
+- `sales_person_id`
+- `product_id`
+
+---
+
+### Dimension Tables
+
+The following dimension tables provide descriptive context for analysis:
+
+- **CUSTOMER**
+  - Customer demographics and location details
+- **STORE**
+  - Store address, pincode, and opening date
+- **SALES_TEAM**
+  - Salesperson attributes and hierarchy (manager relationship)
+- **PRODUCT**
+  - Product name and pricing attributes
+
+---
+
+### Why Star Schema?
+
+- Provides a **clear separation between transactional facts and reference data**
+- Schema enforcement prevents silent data corruption
+- Centralized dimensions reduce duplication across datasets
+- Simplifies Spark SQL joins and aggregations
+- Aligns with industry-standard **data warehouse modeling**
+- Scales well for future BI and reporting use cases
+
+This schema design reflects **real-world data warehouse practices**, making it suitable for production-style ETL pipelines.
 
 ---
 
@@ -123,33 +175,32 @@ Sales-Data-ETL/
 ```
 ---
 
-## How to Run
+## How to Run the Project
 
-### 1. Clone the repository
+### 1. Clone the Repository
 ```
 git clone https://github.com/Aditya-Shinde-21/Retail-Sales-Data-ETL-Pipeline.git
-cd Sales-Data-ETL
+cd Retail-Sales-Data-ETL-Pipeline
 ```
+
 ### 2. Create virtual environment
 ```
 python -m venv .venv
 source .venv/bin/activate      # Linux / macOS
 .venv\Scripts\activate         # Windows
 ```
+
 ### 3. Install dependencies
 ```
 pip install -r requirements.txt
 ```
-Required Windows Subsystem for Linux (WSL) for Airflow if using Windows/macOS setup )
+Required Windows Subsystem for Linux (WSL) for Airflow if using Windows
 
-### 4. Configure AWS and MySQL
-#### Configure AWS credentials for S3 access and update MySQL connection details in ![config](resources/dev/config.py)
+### 4. Generate data and upload it to s3
+Generate data from ![write to local](scripts/generate_data/generate_csv_data.py) and ![write to database](scripts/generate_data/write_generated_data_to_database.py)
+Upload data to s3 from ![upload to s3](scripts/generate_data/upload_file_to_s3.py)
 
-### 5. Generate data and upload it to s3
-#### Generate data from ![write to local](scripts/generate_data/generate_csv_data.py) and ![write to database](scripts/generate_data/write_generated_data_to_database.py)
-#### Upload data to s3 from ![upload to s3](scripts/generate_data/upload_file_to_s3.py)
-
-### 6. Airflow setup
+### 5. Airflow setup
 #### Open WSL terminal and activate airflow virtual environment. Copy DAG to airflow/dags/
 ```
 source ~/airflow_venv/bin/activate
@@ -158,12 +209,12 @@ cp /mnt/d/Retail-Sales-Data-ETL-Pipeline/airflow/sales_etl_dag.py \
 ~/airflow/dags/
 ```
 
-### 7. ETL orchestration
-#### Run ETL orchestration from wsl
+### 6. Launch Airflow from wsl
 ```
 airflow standalone
 ```
-## Airflow Configuration
+
+### 7. Add AWS and MySQL connection to airflow
 
 - AWS and MySQL credentials are managed using **Airflow Connections**
 - No credentials are hardcoded in Spark or application code
@@ -182,28 +233,17 @@ Invalid records are written to a **separate S3 location** for audit, troubleshoo
 
 ---
 
-## Performance Observations
-
-- Disk spill analysis using **Spark UI**
-- Partition tuning (`repartition` vs `coalesce`)
-- Comparison between optimized and unoptimized pipeline runs
-- Demonstrates realistic performance behavior across different data scales and resource constraints
-
----
-
 ## Limitations
 
-- Spark runs in **local mode** (no distributed cluster)
-- IAM roles are not used (local AWS credentials via Airflow Connections)
-- SCD Type 2 logic is discussed but not fully implemented
+- Spark runs in **local mode** (no distributed cluster).
+- IAM roles are not used (AWS S3 credentials via Airflow Connections)
 
 ---
 
 ## Future Enhancements
 
 - Implement **SCD Type 2** for product pricing
-- Add automated **data quality metrics**
-- Introduce backfill and reprocessing strategies
+- staging table based backfill strategy
 - Integrate **Delta Lake** or **Apache Iceberg**
 - Deploy Spark on cloud platforms (EMR / Databricks)
 
@@ -216,8 +256,9 @@ This is **not a toy ETL pipeline**.
 It demonstrates:
 
 - Real-world failure scenarios
-- Debugging and recovery workflows
-- Production-style logging and observability
+- Supports historical backfill using staging table
+- Invalid data isolated for safe reprocessing
+- Production-style logging for Debugging and observability
 - Practical integration of **Apache Spark** and **Apache Airflow**
 
 ---
@@ -227,3 +268,6 @@ It demonstrates:
 **Aditya Shinde**  
 Data Engineer  
 Passionate about building scalable data pipelines
+
+---
+Last updated - january 2026
