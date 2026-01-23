@@ -4,8 +4,8 @@ import os
 import random
 from datetime import datetime, timedelta
 
-
-with open("D:\DE_Project_Files\products_id_price.json", "r") as f:
+# products_id_price.json contains "product_id: price" pairs eg: [{"id" : 1, "current_price" : 487.18}, {"id" : 2, "current_price" : 483.98}]
+with open("path\to\products_id_price.json", "r") as f:
     product_data = json.load(f)
 
 id_price_dict = {
@@ -23,7 +23,7 @@ sales_persons = {
 start_date = datetime(2021, 1, 1)
 end_date = datetime(2025, 12, 31)
 
-file_location = "D:\\DE_Project_Files\\sales_data_to_s3\\"
+file_location = "pathto\\local\\folder\\"
 csv_file_path = os.path.join(file_location, "sales_data.csv")
 
 with open(csv_file_path, "w", newline="") as csvfile:
@@ -61,5 +61,6 @@ with open(csv_file_path, "w", newline="") as csvfile:
     csvwriter.writerow([504, 122, "pro6", 6, "2022-10-22", 55, "", 110])
     csvwriter.writerow([504, 122, 5, "sp22", "2022-10-22", 55, -4, 110])
     csvwriter.writerow([504, 122, 5, 6, "2022-10-22", "fiftyfive", 2, 110])
+
 
 print("CSV file generated successfully.")
