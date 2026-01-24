@@ -17,12 +17,12 @@ def get_spark_session():
 
             # Spark UI persistence
             .config("spark.eventLog.enabled", "true")
-            .config("spark.eventLog.dir", "file:///mnt/d/DE_Project_Files/spark-event-logs")
-            .config("spark.history.fs.logDirectory", "file:///mnt/d/DE_Project_Files/spark-event-logs")
+            .config("spark.eventLog.dir", "file:///path/to/spark-event-logs")
+            .config("spark.history.fs.logDirectory", "file:///path/to/spark-event-logs")
 
             # MySQL connector jar
             .config("spark.driver.extraClassPath",
-                    "/mnt/c/Users/Aditya/PycharmProjects/de_project1/jars/mysql-connector-j-9.5.0.jar")
+                    "/path/to/jars/mysql-connector-j-9.5.0.jar")
             .getOrCreate()
         )
 
@@ -30,4 +30,5 @@ def get_spark_session():
 
     except Exception:
         logger.exception("Failed to create Spark session")
+
         raise
