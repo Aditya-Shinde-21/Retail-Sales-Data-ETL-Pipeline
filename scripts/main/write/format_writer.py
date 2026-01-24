@@ -15,7 +15,6 @@ class FormatWriter:
                 .save()
             
         except Exception as e:
-            logger.error(f"Error writing the data : {str(e)}")
-            traceback_message = traceback.format_exc()
-            print(traceback_message)
-            raise e
+            logger.exception(f"Error writing the data : {str(e)}")
+            raise
+
