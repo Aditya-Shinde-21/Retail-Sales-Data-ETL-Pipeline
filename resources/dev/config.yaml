@@ -1,11 +1,4 @@
-encryption: #Encrypted
-  key: "Z+l/yQcV7HVAXEA6iblbxRxpBzZhFg5ZulbNjVpMwFE="
-  iv: "XC1hVQJCF25Ev8+5aahcQXmE6cWJ423usc78+7VSFGs="
-  salt: "YX/Njo70eMTWLfQiEuD8fw=="
-
 aws:
-  aws_access_key: "NrkN4xUucSuJdh2+Aq9iONVAoYKbk9mBrynvqncb14g=" #Encrypted
-  aws_secret_key: "IRlAahjf8eB99ZiIuCPdPhHxy2Ii5EZdPXFqwLJsBgCPCTolqh8Qek1EuBdyaREl" #Encrypted
   bucket_name: "customer-sales-data-project"
   region: "us-east-1"
 
@@ -18,14 +11,6 @@ s3_directories:
   s3_sales_team_data_mart_partitioned_directory: "sales_data_mart_partitioned"
   s3_bad_records_directory: "bad_records/"
   s3_invalid_records_directory: "invalid_records/"
-
-database:
-  name: "sales_data"
-  host: "host.docker.internal"
-  port: "3306"
-  user: "root"
-  password: "Aditya@2025"
-  driver: "com.mysql.cj.jdbc.Driver"
 
 tables:
   staging_table: "staging_table"
