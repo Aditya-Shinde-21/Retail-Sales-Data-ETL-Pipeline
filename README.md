@@ -243,7 +243,6 @@ Invalid records are written to a **separate S3 location** for audit, troubleshoo
 ## Future Enhancements
 
 - Implement **SCD Type 2** for product pricing
-- staging table based backfill strategy
 - Integrate **Delta Lake** or **Apache Iceberg**
 - Deploy Spark on cloud platforms (EMR / Databricks)
 
