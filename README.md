@@ -255,7 +255,8 @@ This is **not a toy ETL pipeline**.
 It demonstrates:
 
 - Real-world ETL pipeline
-- Supports historical backfill and file status tracking using staging table
+- Supports historical backfill
+- file status tracking using staging table
 - Invalid data isolated for safe reprocessing
 - Production-style logging for Debugging and observability
 - Practical integration of **Apache Spark** and **Apache Airflow**
