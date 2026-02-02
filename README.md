@@ -270,4 +270,4 @@ Data Engineer
 Passionate about building scalable data pipelines
 
 ---
-Last updated - january 2026
+Last updated - January 2026
